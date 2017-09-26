@@ -61,10 +61,16 @@ public abstract class DatabaseConnection {
 
 	public boolean verifyConnection() {
 		if (!isConnectionActive()) {
-			try {
-				reconnect();
-			} catch (SQLException e) {
-				InventorySync.getLogger().error("Reconnecting failed!", e);
+			int attempt = 0;
+			while (attempt < 3) {
+				try {
+					InventorySync.getLogger().info("Trying to reconnect, attempt: " + attempt);
+					reconnect();
+					break;
+				} catch (SQLException e) {
+					attempt++;
+					InventorySync.getLogger().info("Reconnecting failed!", e);
+				}
 			}
 
 			return false;
